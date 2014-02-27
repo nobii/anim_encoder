@@ -24,7 +24,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import scipy.ndimage.measurements as me
+import scipy.ndimage as nd
 import json
 import scipy.misc as misc
 import re
@@ -136,14 +136,14 @@ def generate_animation(anim_name):
             frames.append((int(m.group(1)), anim_name + "/" + f))
     frames.sort()
 
-    images = [misc.imread(f) for t, f in frames]
+    images = [nd.imread(f) for t, f in frames]
 
     zero = images[0] - images[0]
     pairs = zip([zero] + images[:-1], images)
     diffs = [sign((b - a).max(2)) for a, b in pairs]
 
     # Find different objects for each frame
-    img_areas = [me.find_objects(me.label(d)[0]) for d in diffs]
+    img_areas = [nd.measurements.find_objects(nd.measurements.label(d)[0]) for d in diffs]
 
     # Simplify areas
     img_areas = [simplify(x, SIMPLIFICATION_TOLERANCE) for x in img_areas]
